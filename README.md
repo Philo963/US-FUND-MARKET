@@ -1,4 +1,4 @@
-1. Select Data File > 200 MB 
+**1. Select Data File > 200 MB **
 • File: Download the large dataset, containing both U.S. Mutual Funds and ETFs, 
 from Yahoo Finance. Since the file contains 23,783 Mutual Funds and 2,310 
 ETFs, it is expected to be quite large (especially with historical data and financial 
