@@ -45,5 +45,94 @@ for col in df.select_dtypes(include=['object']).columns:
 print(df.isnull().sum())
 
 
+print(df.isnull().sum())
+
 # Summary statistics for numeric columns
 print(df.describe())
+
+
+ #Convert 'date' column to datetime (if applicable)
+if 'date' in df.columns:
+    df['date'] = pd.to_datetime(df['date'])
+
+
+# 1. Distribution of ETFs (If ETF names or identifiers are available in the data)
+if 'ETF_name' in df.columns:
+    sns.countplot(x='ETF_name', data=df)
+    plt.title('Distribution of ETFs')
+    plt.xticks(rotation=90)  # Rotate x-axis labels if there are many ETFs
+
+# 2. Historical Performance (Fund returns over time)
+if 'returns' in df.columns and 'date' in df.columns:
+    sns.lineplot(x='date', y='returns', hue='ETF_name', data=df)
+    plt.title('Historical Returns of ETFs Over Time')
+
+
+# 3. Time Series Line Chart for ETF Prices Over Time
+if 'price' in df.columns and 'date' in df.columns:
+    sns.lineplot(x='date', y='price', hue='ETF_name', data=df)
+    plt.title('ETF Prices Over Time')
+
+
+# 4. Portfolio Allocation (If relevant columns for cash, stocks, bonds are available)
+if 'cash' in df.columns and 'stocks' in df.columns and 'bonds' in df.columns:
+    df[['cash', 'stocks', 'bonds']].plot(kind='bar', stacked=True)
+    plt.title('Portfolio Allocation Across Cash, Stocks, and Bonds')
+
+
+# 5. ESG Scores Distribution (If available)
+if 'esg_score' in df.columns:
+    sns.histplot(df['esg_score'], kde=True)
+    plt.title('Distribution of ESG Scores')
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Select numerical columns (e.g., 'total_net_assets', 'Sharpe_ratio', 'returns', etc.)
+numeric_cols = df.select_dtypes(include=['float64', 'int64']).columns
+
+# Check if there are at least two numerical columns to create a correlation matrix
+if len(numeric_cols) > 1:
+    # Calculate the correlation matrix
+    corr_matrix = df[numeric_cols].corr()
+
+    # Plot the heatmap
+    plt.figure(figsize=(10, 8))  # Adjust the figure size for better readability
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=0.5, square=True)
+    plt.title('Correlation Between Variables', fontsize=15)
+    plt.xticks(rotation=45)
+    plt.yticks(rotation=45)
+    plt.tight_layout()  # Adjust layout to avoid clipping of labels
+    plt.show()
+else:
+    print("Not enough numerical columns for a correlation heatmap.")
+
+
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Check if 'total_net_assets' is in the DataFrame and has non-null values
+if 'total_net_assets' in df.columns and df['total_net_assets'].notnull().sum() > 0:
+    plt.figure(figsize=(10, 6))  # Set figure size for better readability
+
+    # Plot histogram with kernel density estimate (KDE)
+    sns.histplot(df['total_net_assets'].dropna(), kde=True, bins=30, color='blue')
+
+    # Add title and labels
+    plt.title('Distribution of Total Net Assets', fontsize=16)
+    plt.xlabel('Total Net Assets', fontsize=12)
+    plt.ylabel('Frequency', fontsize=12)
+
+    plt.tight_layout()  # Adjust layout to prevent clipping of labels
+    plt.show()
+else:
+    print("Column 'total_net_assets' is not available or contains no valid data.")
+
+
+# 8. Boxplots for comparing financial ratios (alpha, beta, etc.) if available
+if 'alpha' in df.columns and 'beta' in df.columns:
+    sns.boxplot(x='ETF_name', y='alpha', data=df)
+    plt.title('Alpha Comparison Across ETFs')
+    plt.xticks(rotation=90)
