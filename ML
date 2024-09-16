@@ -1,0 +1,57 @@
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+
+# Update feature names based on your dataset
+features = ['fund_sharpe_ratio_5years', 'fund_alpha_10years', 'fund_beta_10years', 'fund_stdev_5years']
+target = 'fund_mean_annual_return_10years'  # Adjust this to the appropriate target
+
+# Check if required columns are present in the DataFrame
+missing_columns = set(features + [target]) - set(df.columns)
+
+if not missing_columns:
+    # Convert all data to numeric (coerce errors to NaN)
+    df = df.apply(pd.to_numeric, errors='coerce')
+    
+    # Handle missing values column-wise, filling numeric columns with their respective mean
+    df.fillna(df.mean(), inplace=True)
+    
+    # Define features (X) and target variable (y)
+    X = df[features]
+    y = df[target]
+    
+    # Split the data into training and testing sets (80% training, 20% testing)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Create a linear regression model
+    model = LinearRegression()
+    
+    # Train the model
+    model.fit(X_train, y_train)
+    
+    # Make predictions on the test set
+    y_pred = model.predict(X_test)
+    
+    # Evaluate the model
+    mse = mean_squared_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
+    mae = mean_absolute_error(y_test, y_pred)
+    
+    print(f'Mean Squared Error (MSE): {mse:.2f}')
+    print(f'R-squared (R2): {r2:.2f}')
+    print(f'Mean Absolute Error (MAE): {mae:.2f}')
+    
+    # Predict future returns with new data
+    new_data = pd.DataFrame({
+        'fund_sharpe_ratio_5years': [1.5],
+        'fund_alpha_10years': [0.05],
+        'fund_beta_10years': [1.2],
+        'fund_stdev_5years': [0.3]
+    })
+    
+    # Make sure new_data contains the same features
+    future_returns = model.predict(new_data)
+    print(f'Predicted future returns: {future_returns[0]:.2f}')
+else:
+    print(f"Required columns are missing from the dataset: {missing_columns}")
